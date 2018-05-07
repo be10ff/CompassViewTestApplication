@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.view.SurfaceHolder;
-import ru.abelov.compassview.R;
 
 public class CompassDrawThread extends Thread {
     Context mContext;
@@ -17,6 +16,8 @@ public class CompassDrawThread extends Thread {
     private SurfaceHolder surfaceHolder;
 
     private Object mPauseLock = new Object();
+
+    GISensors sensors;
 
 //    public CompassDrawThread(SurfaceHolder surfaceHolder) {
 //        this.surfaceHolder = surfaceHolder;
@@ -27,6 +28,7 @@ public class CompassDrawThread extends Thread {
         this.surfaceHolder = surfaceHolder;
         mContext = context;
         arrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow);
+        sensors = new GISensors(mContext);
     }
 
     @Override
@@ -62,7 +64,7 @@ public class CompassDrawThread extends Thread {
                 canvas = surfaceHolder.lockCanvas(null);
                 if (canvas == null) continue;
                 canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-                float[] orientation = GISensors.Instance(mContext).getOrientation();
+                float[] orientation = sensors.getOrientation();
                 canvas.rotate(-orientation[0], canvas.getWidth() / 2, canvas.getHeight() / 2);
                 canvas.drawBitmap(arrow, new Rect(0, 0, (int) arrow_width, (int) arrow_height), new Rect(0, 0, canvas.getWidth(), canvas.getHeight()), null);
             } catch (Exception e) {
