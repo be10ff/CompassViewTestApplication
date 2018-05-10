@@ -6,6 +6,14 @@ public class GIGravity {
     private float m_axisY;
     private float m_axisZ;
 
+    //x-y
+    private double yaw;
+    //y-z
+    private double pitch;
+    //x-z
+    private double roll;
+
+
     public GIGravity() {
         m_axisX = 0;
         m_axisY = 0;
@@ -24,6 +32,8 @@ public class GIGravity {
         m_axisX = xyz[0];
         m_axisY = -xyz[1];
         m_axisZ = xyz[2];
+
+
         init();
     }
 
@@ -32,6 +42,10 @@ public class GIGravity {
         m_axisX = m_axisX / m_norm;
         m_axisY = m_axisY / m_norm;
         m_axisZ = m_axisZ / m_norm;
+
+        yaw = Math.toDegrees(Math.atan(m_axisY/m_axisX));
+        pitch = Math.toDegrees(Math.atan(m_axisY/m_axisZ));
+        roll = Math.toDegrees(Math.atan(m_axisX/m_axisZ));
     }
 
     public float getX() {
@@ -44,5 +58,17 @@ public class GIGravity {
 
     public float getZ() {
         return m_axisZ;
+    }
+
+    public double getYaw() {
+        return yaw;
+    }
+
+    public double getPitch() {
+        return pitch;
+    }
+
+    public double getRoll() {
+        return roll;
     }
 }

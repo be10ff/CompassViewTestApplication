@@ -1,16 +1,20 @@
 package ru.abelov.compassview;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 import android.view.Surface;
 import android.view.WindowManager;
 
 
 public class GISensors {
-//    private static GISensors instance;
+
+    public static String SENSOR_TAG = "SENSOR_TAG";
+    private static GISensors instance;
     //	private LocationManager m_locationManager;
 //	GIMNK2DFilter m_buffer;
     SensorManager m_sensor_manager;
@@ -23,15 +27,18 @@ public class GISensors {
     float[] valuesMagnet;
     int generalise_factor = 3;
     float[] valuesResult;
+    float[] actualGravity;
     float[] inR;
     float[] outR;
     GIGravity m_gravity;
     int m_rotation;
-    GIConveyor m_azimuth;
-    GIConveyor m_pitch;
-    GIConveyor m_roll;
+//    GIConveyor m_azimuth;
+//    GIConveyor m_pitch;
+//    GIConveyor m_roll;
 
     SensorEventListener listener = new SensorEventListener() {
+
+
 
         public void onSensorChanged(SensorEvent event) {
             final float alpha = 0.97f;
@@ -57,9 +64,14 @@ public class GISensors {
                     valuesGravity[0] = alpha * valuesGravity[0] + (1 - alpha) * event.values[0];
                     valuesGravity[1] = alpha * valuesGravity[1] + (1 - alpha) * event.values[1];
                     valuesGravity[2] = alpha * valuesGravity[2] + (1 - alpha) * event.values[2];
+
+                    Log.i(SENSOR_TAG, "TYPE_GRAVITY, RAW= " + valuesGravity[0] + ", " + valuesGravity[1] + ", "+ valuesGravity[2]);
+
                     int rotation = ((WindowManager) m_context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
+                    Log.i(SENSOR_TAG, "ROTATION, RAW= " + rotation);
                     switch (rotation) {
                         case Surface.ROTATION_0: {
+                            m_gravity = new GIGravity(event.values[0], -event.values[1], event.values[2]);
                             break;
                         }
                         case Surface.ROTATION_90: {
@@ -75,6 +87,8 @@ public class GISensors {
                             break;
                         }
                     }
+                    Log.i(SENSOR_TAG, "TYPE_GRAVITY, actual = " + m_gravity.getX() + ", " + m_gravity.getY() + ", "+ m_gravity.getZ());
+
                     break;
                 }
             }
@@ -85,7 +99,7 @@ public class GISensors {
         }
     };
 
-    public GISensors(Context context) {
+    private GISensors(Context context) {
         m_context = context;
         m_sensor_manager = (SensorManager) m_context.getSystemService(Context.SENSOR_SERVICE);
         m_sensor_gravity = m_sensor_manager.getDefaultSensor(Sensor.TYPE_GRAVITY);
@@ -99,11 +113,17 @@ public class GISensors {
         valuesAccelerometer = new float[3];
         valuesMagnet = new float[3];
         valuesResult = new float[3];
+        actualGravity = new float[3];
         inR = new float[9];
         outR = new float[9];
-        m_azimuth = new GIConveyor();
-        m_pitch = new GIConveyor();
-        m_roll = new GIConveyor();
+
+
+
+
+
+//        m_azimuth = new GIConveyor();
+//        m_pitch = new GIConveyor();
+//        m_roll = new GIConveyor();
 //		m_buffer = new GIMNK2DFilter(100);
 //		m_locationManager = (LocationManager)m_context.getSystemService(Context.LOCATION_SERVICE);
     }
@@ -118,13 +138,13 @@ public class GISensors {
 //		public void onStatusChanged(String provider, int status, Bundle extras) {}
 //	};
 
-//    public static GISensors Instance(Context context) {
-//        if (instance == null) {
-//            instance = new GISensors(context);
-//        }
-//        instance.m_context = context;
-//        return instance;
-//    }
+    public static GISensors Instance(Context context) {
+        if (instance == null) {
+            instance = new GISensors(context);
+        }
+        instance.m_context = context;
+        return instance;
+    }
 
     public GIGravity getGravity() {
         return m_gravity;
@@ -177,10 +197,51 @@ public class GISensors {
                 valuesResult[0] = (float) Math.toDegrees(valuesResult[0]);
                 valuesResult[1] = (float) Math.toDegrees(valuesResult[1]);
                 valuesResult[2] = (float) Math.toDegrees(valuesResult[2]);
-                m_azimuth.addValue(valuesResult[0]);
-                m_pitch.addValue(valuesResult[1]);
-                m_roll.addValue(valuesResult[2]);
+//                m_azimuth.addValue(valuesResult[0]);
+//                m_pitch.addValue(valuesResult[1]);
+//                m_roll.addValue(valuesResult[2]);
             }
+        } catch (Exception e) {
+            String res = e.toString();
+        }
+        return;
+    }
+
+    private void getActualGravity() {
+        try {
+
+                int x_axis = SensorManager.AXIS_X;
+                int y_axis = SensorManager.AXIS_Y;
+                m_rotation = ((WindowManager) m_context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
+                switch (m_rotation) {
+                    case (Surface.ROTATION_0):
+                        break;
+                    case (Surface.ROTATION_90): {
+                        x_axis = SensorManager.AXIS_Y;
+                        y_axis = SensorManager.AXIS_MINUS_X;
+                        break;
+                    }
+                    case (Surface.ROTATION_180): {
+                        x_axis = SensorManager.AXIS_X;
+                        y_axis = SensorManager.AXIS_MINUS_Y;
+                        break;
+                    }
+                    case (Surface.ROTATION_270): {
+                        x_axis = SensorManager.AXIS_MINUS_Y;
+                        y_axis = SensorManager.AXIS_X;
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+//                SensorManager.remapCoordinateSystem(inR, x_axis, y_axis, outR);
+//                SensorManager.getOrientation(outR, actualGravity);
+//                actualGravity[0] = (float) Math.toDegrees(actualGravity[0]);
+//                actualGravity[1] = (float) Math.toDegrees(actualGravity[1]);
+//                actualGravity[2] = (float) Math.toDegrees(actualGravity[2]);
+                Log.i(SENSOR_TAG, "TYPE_GRAVITY, actual = " + actualGravity[0] + ", " + actualGravity[1] + ", "+ actualGravity[2]);
+
         } catch (Exception e) {
             String res = e.toString();
         }

@@ -2,6 +2,7 @@ package ru.abelov.compassview;
 
 import java.util.ArrayList;
 
+@Deprecated
 public class GIConveyor {
 
     public final int m_deep = 10;

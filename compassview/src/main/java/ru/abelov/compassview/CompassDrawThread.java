@@ -5,13 +5,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 public class CompassDrawThread extends Thread {
     Context mContext;
     Bitmap arrow;
+
+    Matrix matrix;
     private boolean running = false;
     private SurfaceHolder surfaceHolder;
 
@@ -28,7 +32,8 @@ public class CompassDrawThread extends Thread {
         this.surfaceHolder = surfaceHolder;
         mContext = context;
         arrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow);
-        sensors = new GISensors(mContext);
+        sensors =  GISensors.Instance(mContext);
+        matrix = new Matrix();
     }
 
     @Override
@@ -52,6 +57,17 @@ public class CompassDrawThread extends Thread {
         }
     }
 
+//    https://i.stack.imgur.com/eyibk.jpg
+//вот собственно и ответ. мне надо посчитать угол между вертикальной плоскотью содержащей Y и направлением на север
+
+
+    //короч для вертикально телефона считать угол уже между Z и севером
+    //и отрисовывать не как стрелку, а как шкалу
+
+//    2. это потому что нас интересуют углы между вертикальными плоскостями в которых лежат оси тилипона и такой же вертикальной плоскостью содержащей направление на север
+
+    //ак вот. я могу поверх изображения с камеры рисовать в нужном масштабе(богрешность - радиус, угол зрения - atan (погрешность/расстояние доточки)
+
     @Override
     public void run() {
         Canvas canvas;
@@ -67,6 +83,26 @@ public class CompassDrawThread extends Thread {
                 float[] orientation = sensors.getOrientation();
                 canvas.rotate(-orientation[0], canvas.getWidth() / 2, canvas.getHeight() / 2);
                 canvas.drawBitmap(arrow, new Rect(0, 0, (int) arrow_width, (int) arrow_height), new Rect(0, 0, canvas.getWidth(), canvas.getHeight()), null);
+
+                //ORIENTATION
+//                float[] orientation =
+                matrix.reset();
+                // 90 потому как стрелка на битмапе уже повернута
+
+
+                double yaw = sensors.getGravity().getYaw();
+                double pitch = sensors.getGravity().getPitch();
+                double roll = sensors.getGravity().getRoll();
+
+                Log.i(GISensors.SENSOR_TAG, "yaw = " + yaw + ", pitch = " + pitch + ", roll = " + roll);
+
+
+//                matrix.setRotate((float)(azimuth - 90), image.getWidth()/2, image.getHeight()/2);
+//                matrix.postTranslate((int)(m_map.m_view.centerX() + (1+length)*size*Math.sin(Math.toRadians(azimuth)) - image.getWidth()/2 - map_location[0]), (int)(m_map.m_view.centerY() - (1+length)*size*Math.cos(Math.toRadians(azimuth))- image.getHeight()/2 - map_location[1]));
+//
+//                canvas.drawBitmap(image, matrix, null);
+
+
             } catch (Exception e) {
                 String res = e.toString();
             } finally {
