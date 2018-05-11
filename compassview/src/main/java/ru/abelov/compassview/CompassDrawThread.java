@@ -94,7 +94,7 @@ public class CompassDrawThread extends Thread {
                 double pitch = sensors.getGravity().getPitch();
                 double roll = sensors.getGravity().getRoll();
 
-                Log.i(GISensors.SENSOR_TAG, "yaw = " + yaw + ", pitch = " + pitch + ", roll = " + roll);
+//                Log.i(GISensors.SENSOR_TAG, "yaw = " + yaw + ", pitch = " + pitch + ", roll = " + roll);
 
 
 //                matrix.setRotate((float)(azimuth - 90), image.getWidth()/2, image.getHeight()/2);

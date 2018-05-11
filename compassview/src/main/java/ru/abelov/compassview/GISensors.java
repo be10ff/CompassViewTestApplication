@@ -53,22 +53,23 @@ public class GISensors {
                     break;
                 }
                 case Sensor.TYPE_MAGNETIC_FIELD: {
-//					valuesMagnet = event.values.clone();
-                    valuesMagnet[0] = alpha * valuesMagnet[0] + (1 - alpha) * event.values[0];
-                    valuesMagnet[1] = alpha * valuesMagnet[1] + (1 - alpha) * event.values[1];
-                    valuesMagnet[2] = alpha * valuesMagnet[2] + (1 - alpha) * event.values[2];
+					valuesMagnet = event.values.clone();
+//                    valuesMagnet[0] = alpha * valuesMagnet[0] + (1 - alpha) * event.values[0];
+//                    valuesMagnet[1] = alpha * valuesMagnet[1] + (1 - alpha) * event.values[1];
+//                    valuesMagnet[2] = alpha * valuesMagnet[2] + (1 - alpha) * event.values[2];
+                    Log.i(SENSOR_TAG, "TYPE_MAGNET, RAW= " + valuesMagnet[0] + ", " + valuesMagnet[1] + ", "+ valuesMagnet[2]);
                     break;
                 }
                 case Sensor.TYPE_GRAVITY: {
-//					valuesGravity = event.values.clone();
-                    valuesGravity[0] = alpha * valuesGravity[0] + (1 - alpha) * event.values[0];
-                    valuesGravity[1] = alpha * valuesGravity[1] + (1 - alpha) * event.values[1];
-                    valuesGravity[2] = alpha * valuesGravity[2] + (1 - alpha) * event.values[2];
+					valuesGravity = event.values.clone();
+//                    valuesGravity[0] = alpha * valuesGravity[0] + (1 - alpha) * event.values[0];
+//                    valuesGravity[1] = alpha * valuesGravity[1] + (1 - alpha) * event.values[1];
+//                    valuesGravity[2] = alpha * valuesGravity[2] + (1 - alpha) * event.values[2];
 
-                    Log.i(SENSOR_TAG, "TYPE_GRAVITY, RAW= " + valuesGravity[0] + ", " + valuesGravity[1] + ", "+ valuesGravity[2]);
+//                    Log.i(SENSOR_TAG, "TYPE_GRAVITY, RAW= " + valuesGravity[0] + ", " + valuesGravity[1] + ", "+ valuesGravity[2]);
 
                     int rotation = ((WindowManager) m_context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getOrientation();
-                    Log.i(SENSOR_TAG, "ROTATION, RAW= " + rotation);
+//                    Log.i(SENSOR_TAG, "ROTATION, RAW= " + rotation);
                     switch (rotation) {
                         case Surface.ROTATION_0: {
                             m_gravity = new GIGravity(event.values[0], -event.values[1], event.values[2]);
@@ -204,6 +205,14 @@ public class GISensors {
         } catch (Exception e) {
             String res = e.toString();
         }
+
+//        Trigonometry.Vector gravity = new Trigonometry.Vector(valuesGravity[0], valuesGravity[1], valuesGravity[2]);
+
+        double angle = Math.toDegrees(Trigonometry.angleBetweenPlanes(
+                new Trigonometry.Vector(0, 1, 0),
+                new Trigonometry.Vector(valuesMagnet),
+                new Trigonometry.Vector(valuesGravity)));
+        Log.i(SENSOR_TAG, "AZIMUTH, angle = " + angle);
         return;
     }
 
