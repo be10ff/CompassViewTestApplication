@@ -10,6 +10,7 @@ import ru.abelov.compassview.GISensors;
 public class MainActivity extends AppCompatActivity {
 
     ru.abelov.compassview.CompassView compass;
+    ru.abelov.compassview.CompassView compass_new;
 
 
     @Override
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         compass = (ru.abelov.compassview.CompassView) findViewById(R.id.compass);
+        compass_new = (ru.abelov.compassview.CompassView) findViewById(R.id.compass_new);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {

@@ -17,6 +17,15 @@
         android:id="@+id/compass"
         android:layout_width="128dp"
         android:layout_height="128dp"
+        android:layout_alignParentLeft="true"
         android:layout_centerInParent="true"/>
+
+    <ru.abelov.compassview.CompassView
+        android:id="@+id/compass_new"
+        android:layout_width="128dp"
+        android:layout_height="128dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        app:azimuth="true"/>
 
 </RelativeLayout>

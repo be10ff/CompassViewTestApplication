@@ -21,6 +21,8 @@ public class CompassDrawThread extends Thread {
 
     private Object mPauseLock = new Object();
 
+    boolean newMath;
+
     GISensors sensors;
 
 //    public CompassDrawThread(SurfaceHolder surfaceHolder) {
@@ -28,12 +30,13 @@ public class CompassDrawThread extends Thread {
 //        arrow = BitmapFactory.decodeResource(App.Instance().getResources(), R.drawable.arrow);
 //    }
 
-    public CompassDrawThread(Context context, SurfaceHolder surfaceHolder) {
+    public CompassDrawThread(Context context, SurfaceHolder surfaceHolder, boolean newMath) {
         this.surfaceHolder = surfaceHolder;
         mContext = context;
         arrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow);
         sensors =  GISensors.Instance(mContext);
         matrix = new Matrix();
+        this.newMath = newMath;
     }
 
     @Override
@@ -80,13 +83,22 @@ public class CompassDrawThread extends Thread {
                 canvas = surfaceHolder.lockCanvas(null);
                 if (canvas == null) continue;
                 canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-                float[] orientation = sensors.getOrientation();
-                canvas.rotate(-orientation[0], canvas.getWidth() / 2, canvas.getHeight() / 2);
+
+                float azimuth = 0;
+                if(newMath){
+                    azimuth = -(float)sensors.getAzimuth();
+                } else {
+                    float[] orientation = sensors.getOrientation();
+                    azimuth = -orientation[0];
+                }
+
+                canvas.rotate(azimuth, canvas.getWidth() / 2, canvas.getHeight() / 2);
                 canvas.drawBitmap(arrow, new Rect(0, 0, (int) arrow_width, (int) arrow_height), new Rect(0, 0, canvas.getWidth(), canvas.getHeight()), null);
 
                 //ORIENTATION
 //                float[] orientation =
                 matrix.reset();
+
                 // 90 потому как стрелка на битмапе уже повернута
 
 

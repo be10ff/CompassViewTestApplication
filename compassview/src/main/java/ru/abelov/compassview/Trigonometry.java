@@ -1,5 +1,9 @@
 package ru.abelov.compassview;
 
+import android.util.Log;
+
+import static ru.abelov.compassview.GISensors.SENSOR_TAG;
+
 /**
  * Created by artem on 10.05.18.
  */
@@ -12,13 +16,16 @@ public class Trigonometry {
         Vector normalMagnetGravity = vectorMultiplication(magnet, gravity);
 
         double cos = scalarMultiplication(normalAxisGravity, normalMagnetGravity)/(normalAxisGravity.module()*normalMagnetGravity.module());
+        if(cos > 1) {
+            cos = 1;
+        }
 
         double d = determinant(axis, magnet, gravity);
 
-        double angle = Math.acos(cos)/**Math.signum(d)*/;
+        double angle = Math.acos(cos)*Math.signum(d);
 
 
-
+//        Log.i(SENSOR_TAG, "azimuth, accounted = " + Math.toDegrees(angle));
         return angle;
     }
 
@@ -38,7 +45,7 @@ public class Trigonometry {
 
     public static double scalarMultiplication(Vector a, Vector b){
 
-        double result  = a.x*b.x + a.y*b.y + a.z+b.z;
+        double result  = a.x*b.x + a.y*b.y + a.z*b.z;
         return result;
     }
 

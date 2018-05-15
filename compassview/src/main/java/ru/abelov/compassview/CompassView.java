@@ -1,6 +1,7 @@
 package ru.abelov.compassview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.util.AttributeSet;
@@ -12,13 +13,15 @@ public class CompassView extends SurfaceView implements SurfaceHolder.Callback {
     private CompassDrawThread drawThread;
     private Context mContext;
 
+    boolean newMath;
+
     public CompassView(Context context) {
         super(context);
         mContext = context;
         getHolder().addCallback(this);
         setZOrderOnTop(true);    // necessary
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        drawThread = new CompassDrawThread(mContext, getHolder());
+        drawThread = new CompassDrawThread(mContext, getHolder(), false);
     }
 
     public CompassView(Context context, AttributeSet attrs) {
@@ -29,7 +32,8 @@ public class CompassView extends SurfaceView implements SurfaceHolder.Callback {
             setZOrderOnTop(true);    // necessary
         }
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        drawThread = new CompassDrawThread(mContext, getHolder());
+        init(context, attrs);
+        drawThread = new CompassDrawThread(mContext, getHolder(), newMath);
     }
 
     public CompassView(Context context, AttributeSet attrs, int defStyle) {
@@ -38,7 +42,13 @@ public class CompassView extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
         setZOrderOnTop(true);    // necessary
         getHolder().setFormat(PixelFormat.TRANSLUCENT);
-        drawThread = new CompassDrawThread(mContext, getHolder());
+        init(context, attrs);
+        drawThread = new CompassDrawThread(mContext, getHolder(), newMath);
+    }
+
+    private void init(Context context, AttributeSet attrs) {
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CompassView);
+        newMath = a.getBoolean(R.styleable.CompassView_azimuth, false);
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {

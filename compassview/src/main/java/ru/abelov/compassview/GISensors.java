@@ -35,6 +35,7 @@ public class GISensors {
 //    GIConveyor m_azimuth;
 //    GIConveyor m_pitch;
 //    GIConveyor m_roll;
+    double azimuth;
 
     SensorEventListener listener = new SensorEventListener() {
 
@@ -208,11 +209,11 @@ public class GISensors {
 
 //        Trigonometry.Vector gravity = new Trigonometry.Vector(valuesGravity[0], valuesGravity[1], valuesGravity[2]);
 
-        double angle = Math.toDegrees(Trigonometry.angleBetweenPlanes(
+        azimuth = Math.toDegrees(Trigonometry.angleBetweenPlanes(
                 new Trigonometry.Vector(0, 1, 0),
                 new Trigonometry.Vector(valuesMagnet),
                 new Trigonometry.Vector(valuesGravity)));
-        Log.i(SENSOR_TAG, "AZIMUTH, angle = " + angle);
+        Log.i(SENSOR_TAG, "AZIMUTH, angle = " + azimuth);
         return;
     }
 
@@ -265,6 +266,10 @@ public class GISensors {
 //		return res;
 
         return valuesResult;
+    }
+
+    public double getAzimuth(){
+        return azimuth;
     }
 
 
